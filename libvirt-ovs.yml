@@ -1,0 +1,80 @@
+---
+- name: set up libvirt and openvswitch
+  hosts: localhost
+  become: yes
+  become_user: root
+  vars:
+    - trunk_port: eth2
+    - manage_vlan_name: vlan11
+    - manage_vlan_id: 11
+    - manage_ip: 192.179.1.80
+    - manage_gw: 192.168.1.1
+
+  tasks:
+    - name: install Virtualization Host
+      yum:
+        name: "@^virtualization-host-environment"
+        state: present
+
+    - name: install openswitch
+      yum:
+        name: openvswitch
+        state: present
+
+    - name: start and enable openvswitch
+      service:
+        name: openvswitch
+        state: started
+        enabled: yes
+
+    - name: create openvswitch bridge
+      openvswitch_bridge:
+        bridge: ovsbr0
+        state: present
+      
+    - name: add trunk port to openvswitch
+      openvswitch_port:
+        bridge: ovsbr0
+        port: "{{ trunk_port }}"
+
+    - name: create manage vlan
+      openvswitch_port:
+        bridge: ovsbr0
+        port: "{{ manage_vlan_name }}"
+        tag: "{{ manage_vlan_id }}"
+        state: present
+        set: Interface "{{ manage_vlan_name }}" type=internal
+
+    - name: create mange network script
+      template:
+        src: libvirt-ovs-files/ifcfg-vlan.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-{{ manage_vlan_name }}
+
+    - name: configure the network interface works as trunk
+      template:
+        src: libvirt-ovs-files/ifcfg-eth.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-{{ trunk_port }}
+
+    - name: install supporting pacage for libvirt
+      yum:
+        name:
+          - libvirt-python
+          - python-lxml
+        state: present
+
+    - name: start libvirtd service
+      service:
+        name: libvirtd
+        state: started
+        enabled: yes
+
+    - name: create a libvirt vlan network
+      virt_net:
+        command: define
+        name: ovs-net-vlan2
+        xml: libvirt-ovs-files/ovs-net-vlan2.xml
+
+    - name: start up libvirt vlan network
+      virt_net:
+        command: create
+        name: ovs-net-vlan2

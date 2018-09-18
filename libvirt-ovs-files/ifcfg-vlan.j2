@@ -1,0 +1,21 @@
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=none
+IPADDR={{ manage_ip }}
+PREFIX=24
+GATEWAY={{ manage_gw }}
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME={{ manage_vlan_name }}
+UUID=5cba5e3e-5051-4d8d-99f1-c2349a8c153a
+DEVICE={{ manage_vlan_name }}
+ONBOOT=yes
+NM_CONTROLLED="no"
+DNS1=114.114.114.114
+

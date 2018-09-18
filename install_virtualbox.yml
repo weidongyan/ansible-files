@@ -1,0 +1,38 @@
+---
+- name: Install virtualbox on linux system
+  hosts: localhost
+  become: yes
+  become_user: root
+
+  tasks:
+    - name: Install supporting packages
+      yum:
+        name:
+          - gcc
+          - dkms
+          - make
+          - gt
+          - libgomp
+          - patch
+          - kernel-headers
+          - kernel-devel
+          - binutils
+          - glibc-headers
+          - glibc-devel
+          - fontforge
+        state: present
+    - name: Add virtualbox repo file
+      get_url:
+        url: http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
+        dest: /etc/yum.repos.d/virtualbox.repo
+
+    - name: Install virtualBox
+      yum:
+        name: VirtualBox-5.1
+        state: present
+
+    - name: load kernel model
+      command: /sbin/rcvboxdrv setup
+
+
+

@@ -1,0 +1,11 @@
+<network>
+  <name>ovs-net-vlan3</name>
+  <forward mode='bridge'/>
+  <bridge name='ovsbr0'/>
+  <virtualport type='openvswitch'>
+    <parameters interfaceid='0742d07b-99a8-43f5-87b6-9e3be2ab673e'/>
+  </virtualport>
+    <vlan>
+      <tag id='3'/>
+    </vlan>
+</network>
